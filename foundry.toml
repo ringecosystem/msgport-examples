@@ -1,6 +1,11 @@
 [profile.default]
-src = "src"
-out = "out"
+fs_permissions = [
+    { access = "read-write", path = "./script/output/" },
+    { access = "read", path = "./script/input/" },
+]
 libs = ["lib"]
-
+out = "out"
+src = "src"
+# For Surl https://github.com/memester-xyz/surl
+ffi = true
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
