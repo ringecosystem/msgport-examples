@@ -1,6 +1,6 @@
 # Darwinia Msgport Demo
 
-## Prepare
+## Preparation
 
 ### Install foundry
 
@@ -16,7 +16,7 @@ forge install
 git clone --recursive https://github.com/darwinia-network/msgport-demo.git
 ```
 
-## Test sending message through Msgport
+## Sending cross-chain message via Darwinia Msgport
 
 ### Deploy test contracts (Optional)
 
