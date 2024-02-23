@@ -1,4 +1,4 @@
-# Msgport Demo
+# Darwinia Msgport Demo
 
 ## Prepare
 
@@ -10,7 +10,7 @@ foundryup
 forge install
 ```
 
-### Clone Repo
+### Clone repo and submodules
 
 ```bash
 git clone --recursive https://github.com/darwinia-network/msgport-demo.git
