@@ -54,7 +54,7 @@ contract DeployReceiver is Script {
         string memory portAddr = ScriptTools.readInput("port_address");
         address PORT_ADDR = portAddr.readAddress(".ORMP_PORT");
 
-        vm.setEnv("FOUNDRY_ROOT_CHAINID", "43");
+        vm.setEnv("FOUNDRY_ROOT_CHAINID", vm.toString(block.chainid));
         vm.startBroadcast(vm.envUint("PRIVATE_KEY"));
         TestReceiver receiver = new TestReceiver(PORT_ADDR);
         console.log("TestReceiver deployed: %s", address(receiver));

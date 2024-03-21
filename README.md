@@ -29,7 +29,7 @@ This demo aims to show a workable example of how to integrate Darwinia Msgport p
 2. **(Optional)** For ease of use and simplicity, it is recommended to utilize the pre-deployed contracts for this demo. Deploying your own `TestSender` and `TestReceiver` contracts is an option, but not advised for those who are just looking to try out the demo quickly. The already deployed contract addresses are:
 
     - `TestSender` on Pangolin: [0x94e4e242548315F4133E4Fd1eb0962e0F5b7EF26](https://pangolin.subscan.io/account/0x94e4e242548315F4133E4Fd1eb0962e0F5b7EF26)
-    - `TestReceiver` on Sepolia: [0xFAF51Ec3B55948Ca77fc836C2977C63754B91ee6](https://sepolia.etherscan.io/address/0xFAF51Ec3B55948Ca77fc836C2977C63754B91ee6)
+    - `TestReceiver` on Sepolia: [0xb115B479ef7cBAEae5a69Aae93ADb0287ADaA32c](https://sepolia.etherscan.io/address/0xb115B479ef7cBAEae5a69Aae93ADb0287ADaA32c)
 
     Using these contracts is the most straightforward approach to explore the functionalities of the Darwinia Msgport demo.
 
