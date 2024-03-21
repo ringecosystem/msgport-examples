@@ -24,14 +24,11 @@ contract TestReceiver is Application {
 
     // local port address
     address public immutable PORT;
-    // remote dapp address
-    address public immutable REMOTE_DAPP;
 
     uint256 public sum;
 
-    constructor(address port, address remoteDapp) {
+    constructor(address port) {
         PORT = port;
-        REMOTE_DAPP = remoteDapp;
     }
 
     /// @notice You could check the fromDapp address or messagePort address.
@@ -40,7 +37,6 @@ contract TestReceiver is Application {
         address fromDapp = _xmsgSender();
         address localPort = _msgPort();
         require(localPort == PORT);
-        require(fromDapp == REMOTE_DAPP);
         sum += num;
         emit DappMessageRecv(fromChainId, fromDapp, localPort, num);
     }
