@@ -49,7 +49,7 @@ contract SendMessage is Script {
         bytes memory message = abi.encodeCall(TestReceiver.addReceiveNum, 10);
 
         string memory queryUrl = string.concat(
-            "https://msgport-api.darwinia.network/ormp/fee?from_chain_id=",
+            "https://api.msgport.xyz/ormp/fee?from_chain_id=",
             vm.toString(senderChainId),
             "&to_chain_id=",
             vm.toString(receiverChainId),

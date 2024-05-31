@@ -17,7 +17,7 @@
 
 pragma solidity ^0.8.17;
 
-import "lib/darwinia-msgport/src/interfaces/IMessagePort.sol";
+import "lib/msgport/src/interfaces/IMessagePort.sol";
 
 contract TestSender {
     event DappMessageSent(address localPort, bytes message);
