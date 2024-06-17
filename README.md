@@ -13,7 +13,7 @@ forge install
 ### Clone repo and submodules
 
 ```bash
-git clone --recursive https://github.com/darwinia-network/msgport-demo.git
+git clone --recursive https://github.com/darwinia-network/msgport-examples.git
 ```
 
 ## Sending message from Pangolin to Sepolia via Darwinia Msgport
