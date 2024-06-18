@@ -17,7 +17,7 @@
 
 pragma solidity ^0.8.17;
 
-import "lib/msgport/src/user/Application.sol";
+import "msgport/user/Application.sol";
 
 contract TestReceiver is Application {
     event DappMessageRecv(uint256 fromChainId, address fromDapp, address localPort, uint256 num);

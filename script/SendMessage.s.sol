@@ -20,7 +20,7 @@ pragma solidity ^0.8.17;
 import {stdJson} from "forge-std/StdJson.sol";
 import {Script} from "forge-std/Script.sol";
 import {console2 as console} from "forge-std/console2.sol";
-import {Surl} from "lib/surl/src/Surl.sol";
+import {Surl} from "surl/Surl.sol";
 
 import "./ScriptTools.sol";
 import "../src/TestReceiver.sol";
