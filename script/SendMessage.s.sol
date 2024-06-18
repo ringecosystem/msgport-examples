@@ -32,7 +32,7 @@ contract SendMessage is Script {
     using ScriptTools for string;
 
     function run() public {
-        uint256 senderChainId = 43;
+        uint256 senderChainId = 701;
         uint256 receiverChainId = 11155111;
         address refundAddr = address(0);
 
@@ -45,24 +45,22 @@ contract SendMessage is Script {
         vm.setEnv("FOUNDRY_ROOT_CHAINID", vm.toString(receiverChainId));
         string memory deployReceiver = ScriptTools.readOutput("deploy");
         address TEST_RECEIVER = deployReceiver.readAddress(".TEST_RECEIVER");
-
         bytes memory message = abi.encodeCall(TestReceiver.addReceiveNum, 10);
 
-        string memory queryUrl = string.concat(
-            "https://api.msgport.xyz/ormp/fee?from_chain_id=",
-            vm.toString(senderChainId),
-            "&to_chain_id=",
-            vm.toString(receiverChainId),
-            "&payload=",
-            vm.toString(message),
-            "&from_address=",
-            vm.toString(TEST_SENDER),
-            "&to_address=",
-            vm.toString(TEST_RECEIVER),
-            "&refund_address=",
-            vm.toString(refundAddr)
-        );
-        (, bytes memory resp) = queryUrl.get();
+        string[] memory headers = new string[](1);
+        headers[0] = "Content-Type: application/json";
+        string memory ormp = "ormp";
+        string memory ormpJson = ormp.serialize("refundAddress", vm.toString(refundAddr));
+
+        string memory body = "body";
+        body.serialize("fromChainId", vm.toString(senderChainId));
+        body.serialize("fromAddress", vm.toString(TEST_SENDER));
+        body.serialize("toChainId", vm.toString(receiverChainId));
+        body.serialize("toAddress", vm.toString(TEST_RECEIVER));
+        body.serialize("message", vm.toString(message));
+        string memory finalbody = body.serialize("ormp", ormpJson);
+
+        (uint256 status, bytes memory resp) = "https://api.msgport.xyz/v2/fee_with_options".post(headers, finalbody);
         uint256 fee = vm.parseJsonUint(string(resp), ".data.fee");
         bytes memory params = vm.parseJsonBytes(string(resp), ".data.params");
 
@@ -70,6 +68,18 @@ contract SendMessage is Script {
         sender.send{value: fee}(receiverChainId, TEST_RECEIVER, message, params);
 
         vm.stopBroadcast();
+    }
+}
+
+contract Test is Script {
+    using stdJson for string;
+
+    function run() public {
+        string memory t = "";
+        t.serialize("a", uint256(123));
+        string memory semiFinal = t.serialize("b", string("test"));
+        string memory finalJson = t.serialize("c", semiFinal);
+        console.log("json: %s", finalJson);
     }
 }
 
