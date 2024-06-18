@@ -1,20 +1,3 @@
-// This file is part of Darwinia.
-// Copyright (C) 2018-2024 Darwinia Network
-// SPDX-License-Identifier: GPL-3.0
-//
-// Darwinia is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Darwinia is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Darwinia. If not, see <https://www.gnu.org/licenses/>.
-
 pragma solidity ^0.8.17;
 
 import {stdJson} from "forge-std/StdJson.sol";
@@ -22,11 +5,11 @@ import {Script} from "forge-std/Script.sol";
 import {console2 as console} from "forge-std/console2.sol";
 import {Surl} from "surl/Surl.sol";
 
-import "./ScriptTools.sol";
-import "../src/TestReceiver.sol";
-import "../src/TestSender.sol";
+import "../../../script/ScriptTools.sol";
+import "../src/Counter.sol";
+import "../src/Sender.sol";
 
-contract SendMessage is Script {
+contract IncreaseNumber is Script {
     using Surl for *;
     using stdJson for string;
     using ScriptTools for string;
@@ -68,18 +51,6 @@ contract SendMessage is Script {
         sender.send{value: fee * 2}(receiverChainId, TEST_RECEIVER, message, params);
 
         vm.stopBroadcast();
-    }
-}
-
-contract Test is Script {
-    using stdJson for string;
-
-    function run() public {
-        string memory t = "";
-        t.serialize("a", uint256(123));
-        string memory semiFinal = t.serialize("b", string("test"));
-        string memory finalJson = t.serialize("c", semiFinal);
-        console.log("json: %s", finalJson);
     }
 }
 
