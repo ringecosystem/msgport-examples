@@ -6,6 +6,7 @@ fs_permissions = [
 libs = ["lib"]
 out = "out"
 src = "src"
+viaIR = true
 # For Surl https://github.com/memester-xyz/surl
 ffi = true
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
