@@ -17,27 +17,22 @@
 
 pragma solidity ^0.8.17;
 
-import "msgport/user/Application.sol";
+import "msgport/interfaces/IMessagePort.sol";
 
-contract TestReceiver is Application {
-    event DappMessageRecv(uint256 fromChainId, address fromDapp, address localPort, uint256 num);
+contract TestSender {
+    event MessageSent(address port, uint256 toChainId, address toDapp, bytes32 msgId);
 
-    // local port address
+    // The port address, which can be any messaging protocols that under the Msgport protocol.
     address public immutable PORT;
-
-    uint256 public sum;
 
     constructor(address port) {
         PORT = port;
     }
 
-    /// @notice You could check the fromDapp address or messagePort address.
-    function addReceiveNum(uint256 num) external {
-        uint256 fromChainId = _fromChainId();
-        address fromDapp = _xmsgSender();
-        address localPort = _msgPort();
-        require(localPort == PORT);
-        sum += num;
-        emit DappMessageRecv(fromChainId, fromDapp, localPort, num);
+    // The send method is quite simple, it's more like a wrapper around the internal `IMessagePort`.
+    function send(uint256 toChainId, address toDapp, bytes calldata message, bytes calldata params) external payable {
+        (bytes32 msgId) = IMessagePort(PORT).send{value: msg.value}(toChainId, toDapp, message, params);
+
+        emit MessageSent(PORT, toChainId, toDapp, msgId);
     }
 }
