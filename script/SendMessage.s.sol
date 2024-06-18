@@ -65,7 +65,7 @@ contract SendMessage is Script {
         bytes memory params = vm.parseJsonBytes(string(resp), ".data.params");
 
         TestSender sender = TestSender(TEST_SENDER);
-        sender.send{value: fee}(receiverChainId, TEST_RECEIVER, message, params);
+        sender.send{value: fee * 2}(receiverChainId, TEST_RECEIVER, message, params);
 
         vm.stopBroadcast();
     }
