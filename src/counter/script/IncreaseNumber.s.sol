@@ -7,7 +7,7 @@ import {Surl} from "surl/Surl.sol";
 
 import "../../../script/ScriptTools.sol";
 import "../src/Counter.sol";
-import "../src/Sender.sol";
+import "../src/CounterSender.sol";
 
 contract IncreaseNumber is Script {
     using Surl for *;
@@ -15,56 +15,44 @@ contract IncreaseNumber is Script {
     using ScriptTools for string;
 
     function run() public {
-        uint256 senderChainId = 701;
-        uint256 receiverChainId = 11155111;
+        // Darwinia Koi network as source chain
+        uint256 fromChainId = 701;
+        // Sepolia as target chain
+        uint256 toChainId = 11155111;
         address refundAddr = address(0);
 
-        vm.startBroadcast(vm.envUint("PRIVATE_KEY"));
+        vm.setEnv("FOUNDRY_ROOT_CHAINID", vm.toString(fromChainId));
+        string memory counterSenderOutput = ScriptTools.readOutput("counter-sender");
+        address counterSender = counterSenderOutput.readAddress(".CounterSender");
 
-        vm.setEnv("FOUNDRY_ROOT_CHAINID", vm.toString(senderChainId));
-        string memory deploySender = ScriptTools.readOutput("deploy");
-        address TEST_SENDER = deploySender.readAddress(".TEST_SENDER");
+        vm.setEnv("FOUNDRY_ROOT_CHAINID", vm.toString(toChainId));
+        string memory counterOutput = ScriptTools.readOutput("counter");
+        address counter = counterOutput.readAddress(".Counter");
+        // Construct the message that increases the counter. 
+        bytes memory message = abi.encodeCall(Counter.increaseNumber, ());
 
-        vm.setEnv("FOUNDRY_ROOT_CHAINID", vm.toString(receiverChainId));
-        string memory deployReceiver = ScriptTools.readOutput("deploy");
-        address TEST_RECEIVER = deployReceiver.readAddress(".TEST_RECEIVER");
-        bytes memory message = abi.encodeCall(TestReceiver.addReceiveNum, 10);
-
+        // Request the Msgport API to fetch the necesary fee and params.
         string[] memory headers = new string[](1);
         headers[0] = "Content-Type: application/json";
+        string memory body = "body";
+        body.serialize("fromChainId", vm.toString(fromChainId));
+        body.serialize("fromAddress", vm.toString(counterSender));
+        body.serialize("toChainId", vm.toString(toChainId));
+        body.serialize("toAddress", vm.toString(counter));
+        body.serialize("message", vm.toString(message));
         string memory ormp = "ormp";
         string memory ormpJson = ormp.serialize("refundAddress", vm.toString(refundAddr));
+        string memory finalBody = body.serialize("ormp", ormpJson);
+        console.log("the body is: %s", finalBody);
 
-        string memory body = "body";
-        body.serialize("fromChainId", vm.toString(senderChainId));
-        body.serialize("fromAddress", vm.toString(TEST_SENDER));
-        body.serialize("toChainId", vm.toString(receiverChainId));
-        body.serialize("toAddress", vm.toString(TEST_RECEIVER));
-        body.serialize("message", vm.toString(message));
-        string memory finalbody = body.serialize("ormp", ormpJson);
-
-        (uint256 status, bytes memory resp) = "https://api.msgport.xyz/v2/fee_with_options".post(headers, finalbody);
+        (uint256 _status, bytes memory resp) = "https://api.msgport.xyz/v2/fee_with_options".post(headers, finalBody);
         uint256 fee = vm.parseJsonUint(string(resp), ".data.fee");
         bytes memory params = vm.parseJsonBytes(string(resp), ".data.params");
 
-        TestSender sender = TestSender(TEST_SENDER);
-        sender.send{value: fee * 2}(receiverChainId, TEST_RECEIVER, message, params);
-
+        vm.startBroadcast(vm.envUint("PRIVATE_KEY"));
+        CounterSender sender = CounterSender(counterSender);
+        bytes32 msgId = sender.send{value: fee}(toChainId, counter, message, params);
         vm.stopBroadcast();
-    }
-}
-
-contract CheckSum is Script {
-    using stdJson for string;
-    using ScriptTools for string;
-
-    function run() public {
-        vm.setEnv("FOUNDRY_ROOT_CHAINID", vm.toString(block.chainid));
-        string memory deployReceiver = ScriptTools.readOutput("deploy");
-        address TEST_RECEIVER = deployReceiver.readAddress(".TEST_RECEIVER");
-
-        TestReceiver receiver = TestReceiver(TEST_RECEIVER);
-        uint256 sum = receiver.sum();
-        console.log("Sum: %s", sum);
+        console.log("The message has been sent to chain: %s, msgId: %s", toChainId, vm.toString(msgId));
     }
 }

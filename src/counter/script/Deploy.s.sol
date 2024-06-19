@@ -6,24 +6,25 @@ import {console2 as console} from "forge-std/console2.sol";
 
 import "../../../script/ScriptTools.sol";
 import "../src/Counter.sol";
-import "../src/Sender.sol";
+import "../src/CounterSender.sol";
 
-contract DSender is Script {
+contract DCounterSender is Script {
     using stdJson for string;
     using ScriptTools for string;
 
     function run() public {
         vm.setEnv("FOUNDRY_ROOT_CHAINID", vm.toString(block.chainid));
+        vm.setEnv("FOUNDRY_EXPORTS_OVERWRITE_LATEST", vm.toString(true));
+
         string memory portAddr = ScriptTools.readInput("port_address");
-        address PORT_ADDR = portAddr.readAddress(".ORMP_PORT");
+        address port_address = portAddr.readAddress(".ORMP_PORT");
 
         vm.startBroadcast(vm.envUint("PRIVATE_KEY"));
-        Sender sender = new Sender(PORT_ADDR);
-        console.log("TestSender deployed: %s", address(sender));
-        vm.setEnv("FOUNDRY_ROOT_CHAINID", vm.toString(block.chainid));
-        vm.setEnv("FOUNDRY_EXPORTS_OVERWRITE_LATEST", vm.toString(true));
-        ScriptTools.exportContract("deploy", "TEST_SENDER", address(sender));
+        CounterSender sender = new CounterSender(port_address);
         vm.stopBroadcast();
+
+        console.log("Sender has been deployed at chain: %s, contract: %s", block.chainid, address(sender));
+        ScriptTools.exportContract("counter-sender", "CounterSender", address(sender));
     }
 }
 
@@ -33,16 +34,16 @@ contract DCounter is Script {
 
     function run() public {
         vm.setEnv("FOUNDRY_ROOT_CHAINID", vm.toString(block.chainid));
-        string memory portAddr = ScriptTools.readInput("port_address");
-        address PORT_ADDR = portAddr.readAddress(".ORMP_PORT");
-
-        vm.setEnv("FOUNDRY_ROOT_CHAINID", vm.toString(block.chainid));
-        vm.startBroadcast(vm.envUint("PRIVATE_KEY"));
-        Counter counter = new Counter(PORT_ADDR);
-        console.log("TestReceiver deployed: %s", address(counter));
-        vm.setEnv("FOUNDRY_ROOT_CHAINID", vm.toString(block.chainid));
         vm.setEnv("FOUNDRY_EXPORTS_OVERWRITE_LATEST", vm.toString(true));
-        ScriptTools.exportContract("deploy", "TEST_RECEIVER", address(counter));
+
+        string memory portAddr = ScriptTools.readInput("port_address");
+        address port_address = portAddr.readAddress(".ORMP_PORT");
+
+        vm.startBroadcast(vm.envUint("PRIVATE_KEY"));
+        Counter counter = new Counter(port_address);
         vm.stopBroadcast();
+
+        console.log("Counter has been deployed at chain: %s, contract: %s", block.chainid, address(counter));
+        ScriptTools.exportContract("counter", "Counter", address(counter));
     }
 }
