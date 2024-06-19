@@ -1,5 +1,5 @@
 
-# Darwinia Msgport Demo
+# Cross-chain Counter
 
 ## Preparation
 
@@ -14,111 +14,140 @@ forge install
 ### Clone repo and submodules
 
 ```bash
-git clone --recursive https://github.com/darwinia-network/msgport-examples.git
+git clone --recursive https://github.com/msgport/msgport-examples.git
 ```
 
-## Sending message from Pangolin to Sepolia via Darwinia Msgport
+### Account with balance in the Koi testnet
 
-This demo aims to show a workable example of how to integrate Darwinia Msgport protocols for a dapp and how to send message from the Darwinia official Pangolin testnet to the Ethereum Sepolia testnet. The demo is designed very simple and easy understand, there is a pre-deployed contract in the Sepolia network(target) named `TestReceiver`, which has a `unit256` stoarge, named `sum` and a function name `addReceiveNum(uint256 num)` to support adjust the `sum` value. What we did in this demo is construct a message and sent it to a pre-deployed contract in the Pangolin named `TestSender` to increase the `sum` value in the Sepolia network.  Following the steps listed to have a try by your self and it's really helpful to help the user to understand deeper about the Darwinia Msgport.
+Before proceeding with the tutorial, you need an account with sufficient balance. This is required to perform contract operations in both the Koi and Sepolia testnets. If you don't have an account with sufficient balance, you may encounter difficulties when interacting with these contracts. Once you have the account, copy and create a `.env` file based on the `.env.example` file in the root of the repository. This will allow you to continue with the tutorial.
 
-1. Prepare an account with an efficient balance in the Pangolin testnet, refer to the [Pangolin Faucet](https://docs.darwinia.network/pangolin-chain-1e9ac8b09e874e8abd6a7f18c096ca6a#a3324b7c87ae44d9808753f03b2085b5) for free token. Please note that your account does not require the Sepolia token.
+## Overview
 
-    ```sh
-    export PRIVATE_KEY=0x................................................................
-    ```
+This examples is designed very simple and straightforward, aims to illustrate how to integrate the Msgport protocol for a dapp.
 
-2. **(Optional)** For ease of use and simplicity, it is recommended to utilize the pre-deployed contracts for this demo. Deploying your own `TestSender` and `TestReceiver` contracts is an option, but not advised for those who are just looking to try out the demo quickly. The already deployed contract addresses are:
+Our target is to invoke the `increaseNumber()` function of the Sepolia [Counter](./src/Counter.sol) from the Koi testnet [CounterSender](./src/CounterSender.sol).
 
-    - `TestSender` on Pangolin: [0x94e4e242548315F4133E4Fd1eb0962e0F5b7EF26](https://pangolin.subscan.io/account/0x94e4e242548315F4133E4Fd1eb0962e0F5b7EF26)
-    - `TestReceiver` on Sepolia: [0xb115B479ef7cBAEae5a69Aae93ADb0287ADaA32c](https://sepolia.etherscan.io/address/0xb115B479ef7cBAEae5a69Aae93ADb0287ADaA32c)
+### Deploy Counter in the Sepolia testnet
 
-    Using these contracts is the most straightforward approach to explore the functionalities of the Darwinia Msgport demo.
+Running the script to deploy the `Counter` contract in the Sepolia testnet:
 
-    ```sh
-    ./bin/deploy.sh
-    ```
-3. Query the init `sum` value.
+```bash
+forge script src/counter/script/Deploy.s.sol:DCounter --broadcast --rpc-url https://ethereum-sepolia.publicnode.com
+```
 
-    ```sh
-    ./bin/check.sh
-    ```
+The output:
 
-    the output:
+```bash
+Script ran successfully.                                                                                                                                       
+                                                                                                                                                               
+== Logs ==                                                                                                                                                     
+  Counter has been deployed at chain: 11155111, contract: 0xc2fEFb4FDC7E6CaB6FaC7cb3A83902Aea0cB0348                                                           
+                                                                                                                                                               
+## Setting up 1 EVM.                                                                                                                                           
+==========================                                                                                                                                                                                                                                                                                                    
+Chain 11155111                                                                                                                                                 
+Estimated gas price: 0.055286148 gwei                                                                                                                          
+Estimated total gas used for script: 214358                                                                                                                                                                                                                                                                                   
+Estimated amount required: 0.000011851028112984 ETH                            
+==========================                                                                                                                                                                                                                                                                                                    
+##### sepolia                                                                                                                                                                                                                                                                                                                 
+✅  [Success]Hash: 0xe866afcca912979c531b5100876c3e86315d9a641dcf232c5c95b702e220fe51                                                                                                                                                                                                                                         
+Contract Address: 0xc2fEFb4FDC7E6CaB6FaC7cb3A83902Aea0cB0348                                                                                                   
+Block: 6138758                                                                 
+Paid: 0.00000868981192167 ETH (164935 gas * 0.052686282 gwei)                  
+✅ Sequence #1 on sepolia | Total Paid: 0.00000868981192167 ETH (164935 gas * avg 0.052686282 gwei) 
+```
 
-    ```sh
-    [⠢] Compiling...
-    No files changed, compilation skipped
-    Script ran successfully.
+### Check the initial number value
 
-    == Logs ==
-    Sum: 20
-    ```
-4. Send a cross-chain message using Darwinia Msgport from Pangolin to trigger the `addReceiveNum` function on the Sepolia network, thereby increasing the sum value by 10.
+Once the Counter has been deployed, we can check the current number stored in the Counter.
 
-    ```sh
-    ./bin/send.sh
-    ```
+```bash
+forge script src/counter/script/GetNumber.s.sol:GetNumber --rpc-url https://ethereum-sepolia.publicnode.com 
+```
 
-    the output:
-    ```sh
-    [⠢] Compiling...
-    No files changed, compilation skipped
-    Script ran successfully.
+The output:
 
-    ## Setting up 1 EVM.
-
-    ==========================
-
-    Chain 43
-    Estimated gas price: 210.989116979 gwei
-    Estimated total gas used for script: 334569
-    Estimated amount required: 0.070590417878547051 ETH
-
-    ==========================
-
-    ###
-    Finding wallets for all the necessary addresses...
-    ##
-    Sending transactions [0 - 0].
-    ⠁ [00:00:00] [###########################################################################################################################################################################################################################################################] 1/1 txes (0.0s)
-    Transactions saved to: /home/bear/coding/rust-space/msgport-demo/broadcast/SendMessage.s.sol/43/run-latest.json
-    Sensitive values saved to: /home/bear/coding/rust-space/msgport-demo/cache/SendMessage.s.sol/43/run-latest.json
-
-    ##
-    Waiting for receipts.
-    ⠉ [00:00:15] [#######################################################################################################################################################################################################################################################] 1/1 receipts (0.0s)
-    ##### 43
-    ✅  [Success]Hash: 0x45d1d7668efb49b304cc0317e49a379e967b54ea3c36222d8128adb0d2a8fd3e
-    Block: 2394830
-    Paid: 0.037231252487180544 ETH (242223 gas * 153.706512128 gwei)
-
-    Transactions saved to: /home/bear/coding/rust-space/msgport-demo/broadcast/SendMessage.s.sol/43/run-latest.json
-    Sensitive values saved to: /home/bear/coding/rust-space/msgport-demo/cache/SendMessage.s.sol/43/run-latest.json
-
-    ==========================
-
-    ONCHAIN EXECUTION COMPLETE & SUCCESSFUL.
-    Total Paid: 0.037231252487180544 ETH (242223 gas * avg 153.706512128 gwei)
-    Transactions saved to: /home/bear/coding/rust-space/msgport-demo/broadcast/SendMessage.s.sol/43/run-latest.json
-    Sensitive values saved to: /home/bear/coding/rust-space/msgport-demo/cache/SendMessage.s.sol/43/run-latest.json
-    ```
+```bash
+The current number stored in the Counter is: 0
+```
 
 
-    After sending successfully, you can check the message status in the [Msgport Scan](https://docs.darwinia.network/msgport-scan-20e10e1727de4b07baaee0c7e1e3f627) through the transaction hash `✅  [Success]Hash: 0x45d1d7668efb49b304cc0317e49a379e967b54ea3c36222d8128adb0d2a8fd3e`.
+### Deploy CounterSender in the Koi testnet 
 
-5. Query the init `sum` value again.
+Running the script to deploy the `CounterSender` contract in the Koi testnet:
 
-    ```sh
-    ./bin/check.sh
-    ```
+```bash
+forge script src/counter/script/Deploy.s.sol:DCounterSender --broadcast --rpc-url https://koi-rpc.darwinia.network
+```
 
-    the output:
+The output:
 
-    ```sh
-    [⠢] Compiling...
-    No files changed, compilation skipped
-    Script ran successfully.
+```bash
+[⠊] Compiling...                                                               
+[⠔] Compiling 28 files with Solc 0.8.21                                                                                                                                                                                                                                                                                       
+[⠒] Solc 0.8.21 finished in 3.40s                                              
+Compiler run successful with                                                                                                                        
+Script ran successfully.                                                                                                                                                                                                                                                                                                      
+== Logs ==                                                                     
+  Sender has been deployed at chain: 701, contract: 0x36d95D59391e202b44B37d5599a119C1b718efB1
+                                                                                                                                                               
+## Setting up 1 EVM.                                                                                                                                                                                                                                                                                                          
+==========================                                                                                                                                                                                                                                                                                                    
+Chain 701                                                                      
+                                                                               
+Estimated gas price: 150.706512128 gwei                                        
+Estimated total gas used for script: 272867                                                                                                                                                                                                                                                                                   
+Estimated amount required: 0.041122833844830976 ETH                            
+==========================                                                                                                                                     
+##### 701                                                                                                                                                      
+✅  [Success]Hash: 0xb3985ea1d6b8d9795d829684ef3a0f098e8eab8a45f2d5f65e1256d2e3818e1e
+Contract Address: 0x36d95D59391e202b44B37d5599a119C1b718efB1                                                                                                   
+Block: 97100                                                                                                                                                   
+Paid: 0.015820717523661056 ETH (209954 gas * 75.353256064 gwei)                
+```
+### Send a message from the Koi testnet to the Sepolia testnet
 
-    == Logs ==
-    Sum: 30
-    ```
+```bash
+forge script src/counter/script/IncreaseNumber.s.sol:IncreaseNumber -vv --broadcast --rpc-url https://koi-rpc.darwinia.network --gas-estimate-multiplier 200
+```
+
+The output:
+
+```bash
+Script ran successfully.                                                       
+                                                                               
+== Logs ==                                                                                                                                                     
+  the body is: {"fromAddress":"0x36d95D59391e202b44B37d5599a119C1b718efB1","fromChainId":701,"message":"0x5b4ef819","ormp":{"refundAddress":"0x0000000000000000000000000000000000000000"},"toAddress":"0xea02E187B97622Ca74c58107236b0182CE727b70","toChainId":11155111}                                                      
+  The message has been sent to chain: 11155111, msgId: 0xec7358b1570f5b23dee8a732ece84970e8ab9c349f610440a38c07a5fcd3a772                                      
+                                                                               
+## Setting up 1 EVM.                                                           
+==========================                                                     
+Chain 701                                                                                                                                                      
+Estimated gas price: 150.706512128 wei                                                                                                                        
+Estimated total gas used for script: 264208
+Estimated amount required: 0.039817866156314624 ETH
+
+==========================
+
+##### 701
+✅  [Success]Hash: 0x5a9c8e8150391fd0eee27b8f78128d07fb6c806cc12ff60c220c586daef20a1e
+Block: 97272
+Paid: 0.013607441686549248 ETH (180582 gas * 75.353256064 gwei)
+
+✅ Sequence #1 on 701 | Total Paid: 0.013607441686549248 ETH (180582 gas * avg 75.353256064 gwei)
+```
+
+After submitting the transaction, you have successfully sent a message from the Koi testnet to the Sepolia testnet. Please wait for the message to be delivered and dispatched in the Sepolia testnet. It usually takes less than 5 minutes. Then you can check the number value again in the Sepolia testnet.
+
+### Check the number again
+
+```bash
+forge script src/counter/script/GetNumber.s.sol:GetNumber --rpc-url https://ethereum-sepolia.publicnode.com 
+```
+
+The output:
+
+```bash
+The current number stored in the Counter is: 1
+```
