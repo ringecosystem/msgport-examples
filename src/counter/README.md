@@ -17,7 +17,7 @@ forge install
 git clone --recursive https://github.com/msgport/msgport-examples.git
 ```
 
-### Account with balance in the Koi testnet
+### Account with balance
 
 Before proceeding with the tutorial, you need an account with sufficient balance. This is required to perform contract operations in both the Koi and Sepolia testnets. If you don't have an account with sufficient balance, you may encounter difficulties when interacting with these contracts. Once you have the account, copy and create a `.env` file based on the `.env.example` file in the root of the repository. This will allow you to continue with the tutorial.
 
