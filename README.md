@@ -5,4 +5,4 @@ This repo contains a collection of examples of how to use the [Msgport](https://
 ## Examples
 
 - [Counter](./src/counter/README.md)
-- [PingPong](./src/pingpong/)
+- [PingPong](./src/pingpong/README.md)
