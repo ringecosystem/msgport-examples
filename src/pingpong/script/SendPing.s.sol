@@ -44,7 +44,10 @@ contract SendPing is Script {
 
         (uint256 _status, bytes memory resp) = "https://api.msgport.xyz/v2/fee_with_options".post(headers, finalBody);
         uint256 fee = vm.parseJsonUint(string(resp), ".data.fee");
+        bytes memory params = vm.parseJsonBytes(string(resp), ".data.params");
         console.log("the fee is: %s", vm.toString(fee));
+        console.log("the params is: %s", vm.toString(params));
+
 
         vm.startBroadcast(vm.envUint("PRIVATE_KEY"));
         PingPong pingpong = PingPong(payable(pingpongSource));
