@@ -15,11 +15,12 @@ contract DPingPong is Script {
         vm.setEnv("FOUNDRY_ROOT_CHAINID", vm.toString(block.chainid));
         vm.setEnv("FOUNDRY_EXPORTS_OVERWRITE_LATEST", vm.toString(true));
 
-        string memory portAddr = ScriptTools.readInput("port_address");
-        address port_address = portAddr.readAddress(".ORMP_PORT");
+        string memory input = ScriptTools.readInput("constructor");
+        address port_address = input.readAddress(".ORMP_PORT");
+        uint256 fee = input.readUint(".FEE");
 
         vm.startBroadcast(vm.envUint("PRIVATE_KEY"));
-        PingPong pingpong = new PingPong(port_address);
+        PingPong pingpong = new PingPong(port_address, fee);
         vm.stopBroadcast();
 
         console.log("Sender has been deployed at chain: %s, contract: %s", block.chainid, address(pingpong));

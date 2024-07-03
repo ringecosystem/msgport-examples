@@ -13,16 +13,17 @@ contract PingPong is Application {
 
     // The port address, which can be any messaging protocols that under the Msgport protocol.
     address public immutable PORT;
-    // The default params: the refund address 0x6Bc9543094D17f52CF6b419FB692797E48d275d0 with 10_000_000 gas limit.
+    uint256 public immutable Fee;
     bytes public Params =
         hex"000000000000000000000000000000000000000000000000000000000001da53000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000000";
 
-    constructor(address port) {
+    constructor(address port, uint256 fee) {
         PORT = port;
+        Fee = fee;
     }
 
     function ping(uint256 toChainId, address toDapp, bytes memory message) public payable returns (bytes32 msgId) {
-        msgId = IMessagePort(PORT).send{value: msg.value}(toChainId, toDapp, message, Params);
+        msgId = IMessagePort(PORT).send{value: Fee}(toChainId, toDapp, message, Params);
 
         emit PingSent(block.chainid, toChainId, msgId);
         return msgId;

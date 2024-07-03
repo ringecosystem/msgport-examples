@@ -21,6 +21,8 @@ contract SendPing is Script {
         address refundAddr = address(0);
 
         vm.setEnv("FOUNDRY_ROOT_CHAINID", vm.toString(fromChainId));
+        string memory input = ScriptTools.readInput("constructor");
+        uint256 fee = input.readUint(".FEE");
         string memory souceContract = ScriptTools.readOutput("pingpong");
         address pingpongSource = souceContract.readAddress(".PingPong");
         vm.setEnv("FOUNDRY_ROOT_CHAINID", vm.toString(toChainId));
@@ -43,10 +45,10 @@ contract SendPing is Script {
         console.log("the body is: %s", finalBody);
 
         (uint256 _status, bytes memory resp) = "https://api.msgport.xyz/v2/fee_with_options".post(headers, finalBody);
-        uint256 fee = vm.parseJsonUint(string(resp), ".data.fee");
-        bytes memory params = vm.parseJsonBytes(string(resp), ".data.params");
-        console.log("the fee is: %s", vm.toString(fee));
-        console.log("the params is: %s", vm.toString(params));
+        uint256 api_fee = vm.parseJsonUint(string(resp), ".data.fee");
+        bytes memory api_params = vm.parseJsonBytes(string(resp), ".data.params");
+        console.log("the api_fee is: %s", vm.toString(api_fee));
+        console.log("the api_params is: %s", vm.toString(api_params));
 
 
         vm.startBroadcast(vm.envUint("PRIVATE_KEY"));
