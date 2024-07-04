@@ -7,6 +7,7 @@ import "msgport/interfaces/IMessagePort.sol";
 
 contract PingPong is Application {
     event ReceivedToken(address indexed from, uint256 value);
+
     event PingSent(uint256 fromChainId, uint256 toChainId, bytes32 msgId);
     event PongSent(uint256 fromChainId, uint256 toChainId, bytes32 msgId);
     event PongReceive(uint256 fromChainId, uint256 toChainId);
@@ -24,7 +25,6 @@ contract PingPong is Application {
 
     function ping(uint256 toChainId, address toDapp, bytes memory message) public payable returns (bytes32 msgId) {
         msgId = IMessagePort(PORT).send{value: Fee}(toChainId, toDapp, message, Params);
-
         emit PingSent(block.chainid, toChainId, msgId);
         return msgId;
     }
@@ -35,6 +35,7 @@ contract PingPong is Application {
         address localPort = _msgPort();
         require(localPort == PORT);
 
+        // Call back to the pongReceive() function in the source chain.
         bytes memory message = abi.encodeWithSignature("pongReceive()");
         msgId = ping(fromChainId, fromDapp, message);
         emit PongSent(block.chainid, fromChainId, msgId);
