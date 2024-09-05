@@ -13,7 +13,7 @@ forge install
 ### Clone repo and submodules
 
 ```bash
-git clone --recursive https://github.com/msgport/msgport-examples.git
+git clone --recursive https://github.com/ringecosystem/msgport-examples.git
 ```
 
 ### Account with balance

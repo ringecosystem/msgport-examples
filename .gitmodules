@@ -6,4 +6,4 @@
 	url = https://github.com/memester-xyz/surl
 [submodule "lib/msgport"]
 	path = lib/msgport
-	url = https://github.com/msgport/msgport
+	url = https://github.com/ringecosystem/msgport
